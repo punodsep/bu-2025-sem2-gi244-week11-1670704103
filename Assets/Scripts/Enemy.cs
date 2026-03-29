@@ -1,10 +1,14 @@
 using UnityEngine;
+using System.Collections;
+
 
 public class Enemy : MonoBehaviour
 {
     public float speed = 3f;
     private Rigidbody rb;
     private GameObject player;
+
+    private bool isStunned = false;
 
     private void Awake()
     {
@@ -20,8 +24,26 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isStunned) return;
+
         Vector3 dir = player.transform.position - transform.position;
         dir.Normalize();
         rb.AddForce(dir * speed);
+    }
+
+    public void Stun(float duration)
+    {
+        StartCoroutine(StunCoroutine(duration));
+    }
+
+    IEnumerator StunCoroutine(float duration)
+    {
+        isStunned = true;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        yield return new WaitForSeconds(duration);
+
+        isStunned = false;
     }
 }
